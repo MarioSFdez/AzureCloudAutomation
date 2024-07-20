@@ -1,0 +1,67 @@
+---
+- name: Actualizar lista de paquetes
+  apt:
+    update_cache: yes
+
+- name: Instalar dependencias
+  apt:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+
+- name: Añadir clave Docker GPG
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Agregar repositorio Docker
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu focal stable
+    state: present
+
+- name: Actualizar lista de paquetes
+  apt:
+    update_cache: yes
+
+- name: Instalar docker-ce y docker-compose
+  apt:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - docker-ce
+    - docker-compose
+
+- name: Clonar repostorio docker-mon_logs
+  git:
+    repo: 'https://github.com/MarioSFdez/docker-mon_logs.git'
+    dest: "/home/{{ ansible_user }}/docker-mon_logs/"
+    clone: yes
+    update: yes
+  register: git_clone
+
+- name: Generar archivo de configuración de Discord
+  template:
+    src: cp-discord.json.j2
+    dest: "/home/{{ ansible_user }}/docker-mon_logs/alerting/cp-discord.json"
+
+- name: Asignar al script permisos de ejecución
+  file:
+    path: "/home/{{ ansible_user }}/docker-mon_logs/script_mon_logs.sh"
+    mode: '0755'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Ejecutar script para crear directorios dependientes y aplicar permisos correspondientes
+  command: sh /home/{{ ansible_user }}/docker-mon_logs/script_mon_logs.sh
+  args:
+    chdir: "/home/{{ ansible_user }}/docker-mon_logs"
+
+- name: Levantar servicios usando Docker Compose
+  command: docker-compose up -d
+  args:
+    chdir: "/home/{{ ansible_user }}/docker-mon_logs"
+

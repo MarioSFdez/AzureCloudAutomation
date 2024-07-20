@@ -1,0 +1,22 @@
+apiVersion: 1
+templates:
+  - orgId: 1
+    name: "noti_discord"
+    template: |
+      {{ define "noti_discord" }}
+        {{ if gt (len .Alerts.Firing) 0 }}
+          {{ range .Alerts.Firing }}
+           **- Alerta activa:** {{ .Labels.alertname }} ({{ .Labels.severity }})
+           **- Momento de activación:** {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+           **- Valor actual:** {{ .ValueString }}
+          {{ end }}
+        {{ end }}
+
+        {{ if gt (len .Alerts.Resolved) 0 }}
+          {{ range .Alerts.Resolved }}
+           **- Alerta resuelta:** {{ .Labels.alertname }} ({{ .Labels.severity }})
+           **- Momento de resolución:** {{ .EndsAt.Format "2006-01-02 15:04:05" }}
+           **- Detalles de resolución:** Valor final antes de resolver: {{ .ValueString }}
+          {{ end }}
+        {{ end }}
+      {{ end }}

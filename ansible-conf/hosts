@@ -1,0 +1,7 @@
+[all:vars]
+ansible_user=<remote-user>
+ansible_ssh_private_key_file=/<file-private-key>/prueba-ansible.pem
+
+[all]
+<server0-name> ansible_host=<ip-host> domain=<domain0> dc_webhook="<api-webhooks-discord>"
+<server1-name> ansible_host=<ip-host> domain=<domain1> dc_webhook="<api-webhooks-discord>"

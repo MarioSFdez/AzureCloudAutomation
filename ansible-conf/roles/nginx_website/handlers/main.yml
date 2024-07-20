@@ -1,0 +1,15 @@
+---
+# Handler para reiniciar Nginx
+- name: reiniciar nginx
+  become: true
+  service:
+    name: nginx
+    state: restarted
+    enabled: yes
+
+# Handler para recargar Nginx cuando sean cambios ligeros
+- name: recargar nginx
+  become: true
+  service:
+    name: nginx
+    state: reloaded

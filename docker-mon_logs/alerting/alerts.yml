@@ -1,0 +1,8 @@
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets:
+        - "alertmanager:9093"
+  rule_files:
+    - "test_peticiones.yaml"
+    - "test_visitantes.yaml"

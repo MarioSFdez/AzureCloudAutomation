@@ -1,0 +1,21 @@
+{
+  "apiVersion": 1,
+  "contactPoints": [
+    {
+      "orgId": 1,
+      "name": "Grafana_PETI",
+      "receivers": [
+        {
+          "uid": "ddm6zlvmckcg0c",
+          "type": "discord",
+          "settings": {
+            "message": "{{ template \"noti_discord\" . }}",
+            "url": "url_webhook",
+            "use_discord_username": false
+          },
+          "disableResolveMessage": false
+        }
+      ]
+    }
+  ]
+}

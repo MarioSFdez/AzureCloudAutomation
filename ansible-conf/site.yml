@@ -1,0 +1,10 @@
+---
+- hosts: all
+  become: yes
+  roles:
+    - nginx_base
+    - dependencies
+    - geoip_setup
+    - nginx_geoip_module
+    - nginx_website
+    - docker_monitoring

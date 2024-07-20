@@ -1,0 +1,27 @@
+---
+- name: Actualizar repositorios e instalar Nginx
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  loop:
+    - nginx
+    - software-properties-common
+
+- name: Cambiar zona horaria Europe/Madrid
+  command: timedatectl set-timezone Europe/Madrid
+
+- name: Añadir repositorio de MaxMind
+  apt_repository:
+    repo: ppa:maxmind/ppa
+    state: present
+  notify: recargar nginx
+
+- name: Copiar la clave privada SSH al usuario
+  copy:
+    src: /<ruta-origen>/prueba-ansible.pem
+    dest: /home/{{ ansible_user }}/.ssh/prueba-ansible.pem
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+    remote_src: no

@@ -1,0 +1,32 @@
+version: '3'
+services:
+  loki:
+    container_name: loki
+    image: grafana/loki:2.8.0
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-data:/loki
+      - ./loki-config.yml:/etc/loki/config.yml
+    command: -config.file=/etc/loki/config.yml
+
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:2.8.0
+    volumes:
+      - /var/log/nginx:/var/log/nginx
+      - ./promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana-data:/var/lib/grafana
+      - ./datasources:/etc/grafana/provisioning/datasources
+      - ./dashboards:/etc/grafana/provisioning/dashboards
+      - ./alerting:/etc/grafana/provisioning/alerting
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=<admin_password> #Change <admin_password>
+      - GF_USERS_ALLOW_SIGN_UP=false

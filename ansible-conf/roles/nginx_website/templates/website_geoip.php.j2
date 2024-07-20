@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoIP Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #e0e8f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+            justify-content: space-around;
+            max-width: 1200px;
+            gap: 20px;
+        }
+        .block {
+            background-color: #F6FDFF;
+            padding: 20px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 10px;
+            width: 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #map, .block {
+            flex: 1 1 50%;
+        }
+        #map {
+            height: 500px;
+        }
+        h1 {
+            color: #0056b3;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        h2 {
+            color: #004b97;
+            font-size: 1.5em;
+            margin-top: 0;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 8px 16px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+        }
+        th {
+            background-color: #d6e0f5;
+        }
+    </style>
+</head>
+<body>
+    <h1>GeoIP Information</h1>
+    <!-- Muestra el nombre del host del servidor -->
+    <h2><?php echo gethostname(); ?></h2>
+    <div class="container">
+        <div class="block">
+            <?php
+            // Datos de GeoIP obtenidos del servidor
+            $data = [
+                'Your IP Address' => $_SERVER["REMOTE_ADDR"],
+                'Country Code' => $_SERVER["GEOIP_COUNTRY_CODE"],
+                'Country Name' => $_SERVER["GEOIP_COUNTRY_NAME"],
+                'City Name' => $_SERVER["GEOIP_CITY_NAME"],
+                'Region' => $_SERVER["GEOIP_REGION"],
+                'Region Name' => $_SERVER["GEOIP_REGION_NAME"],
+                'Postal Code' => $_SERVER["GEOIP_POSTAL_CODE"],
+                'Latitude' => $_SERVER["GEOIP_LATITUDE"],
+                'Longitude' => $_SERVER["GEOIP_LONGITUDE"],
+                'Time Zone' => $_SERVER["GEOIP_TIME_ZONE"],
+                'ISP Name' => $_SERVER["GEOIP_ISP_NAME"]
+            ];
+
+            // Generar una tabla con los datos de GeoIP
+            echo '<table>';
+            foreach ($data as $key => $value) {
+                echo "<tr><th>{$key}</th><td>{$value}</td></tr>";
+            }
+            echo '</table>';
+            ?>
+        </div>
+        <div id="map" class="block">
+            <!-- Mapa incrustado usando Google Maps con coordenadas basadas en GeoIP -->
+            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d10000!2d<?php echo $_SERVER["GEOIP_LONGITUDE"]; ?>!3d<?php echo $_SERVER["GEOIP_LATITUDE"]; ?>!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses!2ses!4v<?php echo time(); ?>" style="border:0; width: 100%; height: 100%;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </div>
+</body>
+</html>

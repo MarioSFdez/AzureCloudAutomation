@@ -1,0 +1,95 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: test_visitantes
+      folder: test_alertas
+      interval: 5m
+      rules:
+        - uid: adn73emhtt534f
+          title: Visitantes
+          condition: Alerta
+          data:
+            - refId: A
+              queryType: range
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: loki123
+              model:
+                datasource:
+                    type: loki
+                    uid: loki123
+                editorMode: code
+                expr: count(sum by (remote_addr) (count_over_time({job="nginx-geoip"} | json [1h])))
+                intervalMs: 3.6e+06
+                legendFormat: ""
+                maxDataPoints: 43200
+                queryType: range
+                refId: A
+            - refId: Promedio Visitantes
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: mean
+                refId: Promedio Visitantes
+                type: reduce
+            - refId: Alerta
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 5
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: Promedio Visitantes
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: Alerta
+                type: threshold
+          dashboardUid: fdmv9wcwb3jeof
+          panelId: 2
+          noDataState: NoData
+          execErrState: Error
+          for: 1h
+          annotations:
+            __dashboardUid__: fdmv9wcwb3jeof
+            __panelId__: "2"
+          isPaused: false
+          notification_settings:
+            receiver: Grafana_PETI

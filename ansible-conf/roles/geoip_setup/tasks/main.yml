@@ -1,0 +1,43 @@
+---
+- name: Actualizar lista de paquetes
+  apt:
+    update_cache: yes
+
+- name: Instalar dependencias para GeoIP
+  apt:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - geoipupdate
+    - libmaxminddb0
+    - libmaxminddb-dev
+    - mmdb-bin
+
+- name: Configurar archivo GeoIP.conf
+  template:
+    src: GeoIP.conf.j2
+    dest: /etc/GeoIP.conf
+
+- name: Crear directorio GeoIP si no existe
+  ansible.builtin.file:
+    path: /var/lib/GeoIP
+    state: directory
+
+- name: Sincronizar bases de datos GeoIP
+  synchronize:
+    src: "roles/geoip_setup/databases/"
+    dest: "/var/lib/GeoIP/"
+
+- name: Actualizar base de datos GeoIP
+  command: geoipupdate
+
+- name: Editar Crontab para actualizar las BBDD GeoIP
+  cron:
+    name: "Actualizar GeoIP cada mes"
+    minute: "0"
+    hour: "2"
+    day: "*"
+    month: "*"
+    weekday: "2"
+    job: "/usr/bin/geoipupdate"
+    state: present

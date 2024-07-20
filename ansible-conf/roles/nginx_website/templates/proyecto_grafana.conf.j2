@@ -1,0 +1,29 @@
+# Redirigir todo el trafico HTTP a HTTPS para Grafana
+server {
+    listen 80;
+    listen [::]:80;
+    server_name grafana.{{ domain }};
+    return 301 https://$host$request_uri;
+}
+
+# Configuracion HTTPS para Grafana
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name grafana.{{ domain }};
+    ssl_certificate /etc/letsencrypt/live/grafana.{{ domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/grafana.{{ domain }}/privkey.pem;
+
+    location / {
+        # Pasa todas las solicitudes a Grafana
+        proxy_pass http://localhost:3000;
+        # Configura los encabezados HTTP para la solicitud proxy
+        proxy_set_header Host $host;
+        # Establece el encabezado X-Real-IP con la IP del cliente
+        proxy_set_header X-Real-IP $remote_addr;
+        # Establece el encabezado X-Forwarded-For con la cadena de direcciones IP anteriores
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        # Establece el encabezado X-Forwarded-Proto con el esquema de la solicitud (HTTP o HTTPS)
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

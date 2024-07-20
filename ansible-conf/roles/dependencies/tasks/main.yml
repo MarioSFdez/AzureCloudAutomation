@@ -1,0 +1,14 @@
+---
+- name: Instalar dependencias
+  apt:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - libpcre3
+    - libpcre3-dev
+    - zlib1g
+    - zlib1g-dev
+    - libssl-dev
+    - build-essential
+    - php7.4-fpm
+    - certbot

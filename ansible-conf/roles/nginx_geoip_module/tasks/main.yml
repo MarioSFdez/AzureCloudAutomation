@@ -1,0 +1,59 @@
+---
+- name: Crear directorio nginx-geoip en el home del usuario
+  file:
+    path: "/home/{{ ansible_user }}/nginx-geoip"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0755
+
+- name: Clonar ngx_http_geoip2_module de GitHub
+  git:
+    repo: 'https://github.com/leev/ngx_http_geoip2_module.git'
+    dest: "/home/{{ ansible_user }}/nginx-geoip/ngx_http_geoip2_module"
+    clone: yes
+    update: yes
+
+- name: Obtener la versión actual de Nginx
+  shell: nginx -v 2>&1 | awk -F '/' '{print $2}' | awk '{print $1}'
+  register: nginx_version
+  changed_when: false
+
+- name: Descargar la versión correspondiente de Nginx
+  get_url:
+    url: "http://nginx.org/download/nginx-{{ nginx_version.stdout }}.tar.gz"
+    dest: "/home/{{ ansible_user }}/nginx-geoip/nginx-{{ nginx_version.stdout }}.tar.gz"
+
+- name: Descomprimir la versión correspondiente de Nginx
+  unarchive:
+    src: "/home/{{ ansible_user }}/nginx-geoip/nginx-{{ nginx_version.stdout }}.tar.gz"
+    dest: "/home/{{ ansible_user }}/nginx-geoip/"
+    remote_src: yes
+    creates: "/home/{{ ansible_user }}/nginx-geoip/nginx-{{ nginx_version.stdout }}"
+
+- name: Configurar Nginx con el módulo GeoIP2
+  command: ./configure --with-compat --add-dynamic-module=../ngx_http_geoip2_module
+  args:
+    chdir: "/home/{{ ansible_user }}/nginx-geoip/nginx-{{ nginx_version.stdout }}"
+
+- name: Compilar módulos de Nginx
+  command: make modules
+  args:
+    chdir: "/home/{{ ansible_user }}/nginx-geoip/nginx-{{ nginx_version.stdout }}"
+
+- name: Crear directorio de módulos de Nginx si no existe
+  file:
+    path: /etc/nginx/modules
+    state: directory
+    mode: 0755
+
+- name: Copiar módulo GeoIP2 compilado a la carpeta de módulos de Nginx
+  copy:
+    src: "/home/{{ ansible_user }}/nginx-geoip/nginx-{{ nginx_version.stdout }}/objs/ngx_http_geoip2_module.so"
+    dest: "/etc/nginx/modules/ngx_http_geoip2_module.so"
+    remote_src: yes
+
+- name: Reiniciar Nginx
+  service:
+    name: nginx
+    state: restarted

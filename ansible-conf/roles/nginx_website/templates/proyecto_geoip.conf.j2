@@ -1,0 +1,70 @@
+# Redirigir todo el tráfico HTTP a HTTPS para el dominio principal
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name {{ domain }} www.{{ domain }};
+    return 301 https://{{ domain }}$request_uri;
+
+    # Generar logs para Promtail
+    access_log /var/log/nginx/analytics.log json_analytics;
+}
+
+# Configuración HTTPS para el dominio principal
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name {{ domain }} www.{{ domain }}; 
+    ssl_certificate /etc/letsencrypt/live/{{ domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ domain }}/privkey.pem;
+
+    root /var/www/html/proyecto_mario;
+    index geoip.php;
+
+    location / {
+        try_files $uri $uri/ =404; 
+    }
+
+    # Generar logs para Promtail
+    access_log /var/log/nginx/analytics.log json_analytics;
+
+    # Bloquear países no permitidos
+     if ($allowed_country = no) {
+	# Devolver un error 444 si el pais no está permitido
+        return 444;  
+     }
+
+    location ~ \.php$ {
+	# Incluir la configuración de FastCGI para PHP
+        include snippets/fastcgi-php.conf;
+	# Especificar la ruta del socket de FastCGI para PHP
+        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+	# Pasa el nombre del archivo del script a FastCGI
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; 
+
+        # Pasa variables GeoIP a PHP
+	# Código del país
+        fastcgi_param GEOIP_COUNTRY_CODE $geoip2_data_country_code; 
+	# Nombre de la ciudad
+        fastcgi_param GEOIP_COUNTRY_NAME $geoip2_data_country_name;
+	# Nombre de la ciudad 
+        fastcgi_param GEOIP_CITY_NAME $geoip2_data_city_name; 
+        # Nombre de la ciudad
+        fastcgi_param GEOIP_CITY $geoip2_data_city_name;
+	# Region
+        fastcgi_param GEOIP_REGION $geoip2_data_region; 
+        # Nombre de la region
+	fastcgi_param GEOIP_REGION_NAME $geoip2_data_region_name;  
+        # Codigo Postal
+	fastcgi_param GEOIP_POSTAL_CODE $geoip2_data_postal_code;  
+        # Latitud
+	fastcgi_param GEOIP_LATITUDE $geoip2_data_latitude;  
+        # Longitud
+	fastcgi_param GEOIP_LONGITUDE $geoip2_data_longitude;  
+        # Zona horaria
+	fastcgi_param GEOIP_TIME_ZONE $geoip2_data_time_zone;  
+        
+        # Nombre del ISP
+        fastcgi_param GEOIP_ISP_NAME $geoip2_data_isp;
+    }
+}
+

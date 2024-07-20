@@ -1,0 +1,67 @@
+---
+- name: Eliminar enlace simbólico predeterminado de Nginx
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Aplicar configuración personalizada de Nginx
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+
+- name: Crear directorio proyecto-mario en /var/www/html
+  file:
+    path: "/var/www/html/proyecto_mario"
+    state: directory
+    owner: "www-data"
+    group: "www-data"
+    mode: 0755
+
+- name: Subir la pagina web creada
+  template:
+    src: website_geoip.php.j2
+    dest: /var/www/html/proyecto_mario/geoip.php
+    owner: "www-data"
+    group: "www-data"
+    mode: 0755
+
+- name: Configurar sitio de Nginx para proyecto GeoIP
+  template:
+    src: proyecto_geoip.conf.j2
+    dest: /etc/nginx/sites-available/proyecto_geoip.conf
+
+- name: Configurar sitio de Nginx para Grafana
+  template:
+    src: proyecto_grafana.conf.j2
+    dest: /etc/nginx/sites-available/proyecto_grafana.conf
+
+- name: Crear enlace simbólico para proyecto_geoip
+  file:
+    src: /etc/nginx/sites-available/proyecto_geoip.conf
+    dest: /etc/nginx/sites-enabled/proyecto_geoip.conf
+    state: link
+
+- name: Crear enlace simbólico para proyecto_grafana
+  file:
+    src: /etc/nginx/sites-available/proyecto_grafana.conf
+    dest: /etc/nginx/sites-enabled/proyecto_grafana.conf
+    state: link
+
+- name: Detener nginx
+  become: true
+  service:
+     name: nginx
+     state: stopped
+
+- name: Obtener certificados SSL con Certbot en modo standalone al dominio principal
+  command: certbot certonly --standalone --non-interactive --agree-tos --email <your-email> -d {{ domain }}
+
+
+- name: Obtener certificados SSL con Certbot en modo standalone al subdominio
+  command: certbot certonly --standalone --non-interactive --agree-tos --email <your-email> -d grafana.{{ domain }}
+
+- name: Iniciar Nginx
+  service:
+    name: nginx
+    state: started
+    enabled: yes
