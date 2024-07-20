@@ -15,7 +15,7 @@ Como complemento a este entorno, las alertas de Grafana serán configuradas para
 La relevancia de este trabajo se encuentra en su capacidad para proporcionar una solución replicable y eficiente que puede ser adoptada por organizaciones que buscan mejorar su infraestructura de TI en la nube.
 
 ## Diseño de la infraestructura
-![alt text](image-1.png)
+![image-1](https://github.com/user-attachments/assets/84d421c6-e1b5-44b5-9b3e-55d3bdf2a88f)
 
 ## Tecnologías Usadas
 
@@ -140,31 +140,40 @@ https://grafana.dominio1
 ```
 ## Resultado
 ### Despliegue de la infraestructura
-![alt text](image-6.png)
-![alt text](image-7.png)
+![image-6](https://github.com/user-attachments/assets/830e846a-931b-4366-b5bb-ced33e65cf54)
+
+![image-7](https://github.com/user-attachments/assets/8f7c5571-ab9a-4069-a3e8-a6edecf23e66)
+
 ### Configuración con Ansible
-![alt text](image-8.png)
+![image-8](https://github.com/user-attachments/assets/68156b4d-47a5-435d-9f61-61b646e316ea)
+
 ### Servidor 0
-![alt text](image.png)
+![image](https://github.com/user-attachments/assets/b4a09df3-891c-4ea5-8e25-e893d246fa87)
+
 
 ### Servidor 1
-![alt text](image-2.png)
+![image-2](https://github.com/user-attachments/assets/40ae8f04-e088-404b-9748-7a2e4192602f)
+
 
 ### Monitorización
-![alt text](image-4.png)
+![image-4](https://github.com/user-attachments/assets/f65d495d-d2b8-4e18-9344-37966636134d)
+
 
 ### Alertas para prevenir ataques DDoS
-![alt text](image-5.png)
+![image-5](https://github.com/user-attachments/assets/9c810003-6fe8-48cc-9b1c-4b73e8473b1b)
+
 
 ### Balanceador de carga
 
 ### Servidor 1
 
-![alt text](image-9.png)
+![image-9](https://github.com/user-attachments/assets/aae1869f-8acd-4d18-8efd-fd161899bb58)
+
 
 ### Servidor 0
 
-![alt text](image-10.png)
+![image-10](https://github.com/user-attachments/assets/2c4d1069-ea00-4ec1-9c6a-8c4ed7df285e)
+
 
 ## Conclusión
 Este proyecto demuestra la capacidad de Terraform y Ansible para la automatización de infraestructuras en Azure, resultando en mejoras significativas en eficiencia, seguridad y escalabilidad.
