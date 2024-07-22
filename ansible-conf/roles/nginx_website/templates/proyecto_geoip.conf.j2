@@ -37,6 +37,7 @@ server {
 	# Incluir la configuración de FastCGI para PHP
         include snippets/fastcgi-php.conf;
 	# Especificar la ruta del socket de FastCGI para PHP
+ 	# Modificar la versión del php-fpm correspondiente
         fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
 	# Pasa el nombre del archivo del script a FastCGI
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; 
